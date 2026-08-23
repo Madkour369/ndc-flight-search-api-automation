@@ -40,7 +40,7 @@ jobs:
 
       - name: Generate executive QA report
         if: always()
-        run: node generate_html_report.js
+        run: node .agent/skills/ndc-api-reporter/generate_report.js
 
       - name: Upload Execution QA Report
         if: always()
