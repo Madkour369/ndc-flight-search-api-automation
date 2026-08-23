@@ -5,3 +5,5 @@ target/
 .vscode/
 allure-report/
 .allure/
+node_modules/
+Execution_QA_Report.html

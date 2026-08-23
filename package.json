@@ -1,0 +1,10 @@
+{
+  "name": "ndc-flight-search-api-automation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Executive HTML report generator for the NDC FlightSearch API automation suite (test execution itself is Maven/TestNG -- see pom.xml)",
+  "scripts": {
+    "test": "mvn -B clean test && node generate_html_report.js",
+    "report": "node generate_html_report.js"
+  }
+}

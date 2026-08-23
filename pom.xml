@@ -5,12 +5,17 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tildetech</groupId>
-    <artifactId>ndc-flight-search-automation</artifactId>
+    <artifactId>api-test-automation-framework</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>NDC Flight Search API Automation</name>
-    <description>RestAssured + TestNG API test automation suite for the NDC FlightSearch endpoint</description>
+    <name>API Test Automation Framework</name>
+    <description>
+        Generic, reusable RestAssured API test automation core engine
+        (src/main/java) with an NDC FlightSearch endpoint module built on
+        top of it, plus the TestNG test suite (src/test/java) that consumes
+        that core.
+    </description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -21,9 +26,7 @@
         <testng.version>7.10.2</testng.version>
         <jackson.version>2.17.2</jackson.version>
         <lombok.version>1.18.34</lombok.version>
-        <assertj.version>3.26.3</assertj.version>
         <allure.version>2.29.0</allure.version>
-        <slf4j.version>2.0.16</slf4j.version>
         <aspectj.version>1.9.22.1</aspectj.version>
 
         <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
@@ -42,43 +45,36 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- REST Assured -->
+        <!--
+          REST Assured is deliberately a main-scope (not test-scope)
+          dependency here: BaseApiClient and RequestSpecFactory live in
+          src/main/java and are compiled as part of the reusable framework
+          artifact, not as test-only code.
+        -->
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>json-path</artifactId>
             <version>${rest-assured.version}</version>
-            <scope>test</scope>
         </dependency>
 
-        <!-- TestNG -->
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>${testng.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Jackson for POJO (de)serialization -->
+        <!-- Jackson: request/response POJO (de)serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>${jackson.version}</version>
-            <scope>test</scope>
         </dependency>
 
-        <!-- Lombok -->
+        <!-- Lombok: annotation-processing only, never on the runtime classpath -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -86,37 +82,34 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Assertions -->
+        <!--
+          Allure's RestAssured filter is attached to every spec inside
+          RequestSpecFactory (main code), so it's a main-scope dependency.
+          allure-testng (below) is test-scope: it's only used for
+          @Epic/@Feature/@Story annotations on TestNG classes, which don't
+          exist yet.
+        -->
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-            <scope>test</scope>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-rest-assured</artifactId>
         </dependency>
 
-        <!-- Allure reporting -->
+        <!-- TestNG: the test runner for everything under src/test/java. -->
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-testng</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.qameta.allure</groupId>
-            <artifactId>allure-rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
-        <finalName>ndc-flight-search-automation</finalName>
+        <finalName>api-test-automation-framework</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -143,6 +136,10 @@
                     <suiteXmlFiles>
                         <suiteXmlFile>testng.xml</suiteXmlFile>
                     </suiteXmlFiles>
+                    <!-- Required for Allure's @Step annotation to actually emit
+                         step nodes; @Epic/@Feature/@Story/@Severity are plain
+                         reflection and don't need it, but @Step (used in
+                         base.BaseTest) does. -->
                     <argLine>
                         -javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
                     </argLine>

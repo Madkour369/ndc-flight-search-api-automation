@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="NDC FlightSearch API Suite" parallel="classes" thread-count="2" verbose="1">
-
-    <listeners>
-        <listener class-name="io.qameta.allure.testng.AllureTestNg"/>
-    </listeners>
-
-    <test name="FlightSearch - Positive">
+<suite name="NDC FlightSearch API Suite" parallel="classes" thread-count="2">
+    <test name="Positive Scenarios">
         <classes>
-            <class name="com.tildetech.ndc.automation.tests.FlightSearchPositiveTests"/>
+            <class name="tests.FlightSearchPositiveTests"/>
         </classes>
     </test>
-
-    <test name="FlightSearch - Negative">
+    <test name="Negative Scenarios">
         <classes>
-            <class name="com.tildetech.ndc.automation.tests.FlightSearchNegativeTests"/>
+            <class name="tests.FlightSearchNegativeTests"/>
         </classes>
     </test>
-
 </suite>

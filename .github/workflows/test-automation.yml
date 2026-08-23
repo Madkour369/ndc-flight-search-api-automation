@@ -23,10 +23,32 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # `clean test` (not a bare `test`) so target/allure-results starts
+      # empty on every run -- otherwise a self-hosted/cached runner could
+      # carry over stale results from a previous run and double-count them
+      # in both the Allure report and the executive HTML report below.
       - name: Run TestNG suite
         env:
           NDC_API_KEY: ${{ secrets.NDC_API_KEY }}
-        run: mvn -B test
+          NDC_CLIENT_ID: ${{ secrets.NDC_CLIENT_ID }}
+        run: mvn -B clean test
+
+      - name: Generate executive QA report
+        if: always()
+        run: node generate_html_report.js
+
+      - name: Upload Execution QA Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: execution-qa-report
+          path: Execution_QA_Report.html
+          retention-days: 30
 
       - name: Generate Allure report
         if: always()
